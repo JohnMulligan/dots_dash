@@ -87,10 +87,14 @@ for result in results:
 			processed_result[f'COLLECTION__{collection_key}']=None
 	
 	processed_results.append(processed_result)
+
+def html_dump(df,filename):
+	html_str=df.to_html()
+	d=open(f'{filename}.html','w')
+	d.write(html_str)
+	d.close()
 	
 df = pd.DataFrame.from_records(processed_results)
-
-
 
 df2=df.copy()
 
@@ -101,7 +105,7 @@ consolidated_statuses=[]
 for r in status_columns.itertuples():
 	rdict=r._asdict()
 	
-	print(rdict['status'])
+# 	print(rdict['status'])
 	
 	if rdict['digitization_status']=='Not Digitized':
 		if rdict['status']=='UNABLE_TO_DIGITIZE':
@@ -116,8 +120,8 @@ for r in status_columns.itertuples():
 
 df2['consolidated_statuses']=consolidated_statuses
 
-print(df2)
-print(df2['consolidated_statuses'].unique())
+# print(df2)
+# print(df2['consolidated_statuses'].unique())
 
 median_num_pages=df2['number_of_pages'].median()
 
@@ -131,9 +135,13 @@ df4=df4.reset_index()
 sunburst = px.sunburst(df4,path=['Collection Name','Status'],values='Count')
 sunburst.show()
 
+html_dump(sunburst,'sunburst')
+
+
 histogram=px.histogram(df4,x="Collection Name",y="Count",color="Status",barmode="stack",barnorm='percent')
 histogram.show()
 
+html_dump(histogram,'histogram')
 
 df5=df3[['Status','Count']]
 
@@ -141,6 +149,7 @@ df6=df5.groupby('Status').count()
 df6=df6.reset_index()
 pie=px.pie(df6,names='Status',values='Count')
 pie.show()
+html_dump(pie,'pie')
 
 df=df3.fillna(10)
 
@@ -154,3 +163,5 @@ bar = px.bar(df,
 	text="Name"
 )
 bar.show()
+
+html_dump(bar,'bar')
